@@ -1,0 +1,22 @@
+name: Build Publish Github pages
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: borales/actions-yarn@v2.1.0
+      with:
+        cmd: install # will run `yarn install` command
+    - uses: borales/actions-yarn@v2.1.0
+      with:
+        cmd: build # will run `yarn build` command
+    - name: Deploy pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        # github_token: ${{ secrets.GITHUB_TOKEN }}
+        # personal_token: ${{ secrets.PERSONAL_TOKEN }}
+        publish_dir: ./web_deploy
