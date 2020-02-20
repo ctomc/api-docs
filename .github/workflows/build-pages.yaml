@@ -1,4 +1,4 @@
-name: Build Publish Github pages
+name: Build docs and publish to Github pages
 
 on: [push]
 
@@ -17,6 +17,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        # github_token: ${{ secrets.GITHUB_TOKEN }}
-        # personal_token: ${{ secrets.PERSONAL_TOKEN }}
         publish_dir: ./web_deploy
+        keep_files: true
