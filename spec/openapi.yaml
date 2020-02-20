@@ -221,6 +221,63 @@ tags:
      }
     ```
 paths:
+  /v1/order/{orderId}:
+    get:
+      tags:
+      - Trading
+      operationId: status
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderInfo'
+    delete:
+      tags:
+      - Trading
+      operationId: cancelOrder
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: accountId
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderInfo'
   /v1/order/offer:
     post:
       tags:
@@ -291,63 +348,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderInfo'
-  /v1/order/{orderId}:
-    get:
-      tags:
-      - Trading
-      operationId: status
-      parameters:
-      - name: orderId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: accountId
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderInfo'
-    delete:
-      tags:
-      - Trading
-      operationId: cancelOrder
-      parameters:
-      - name: orderId
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: accountId
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderInfo'
   /v1/order/orders:
     get:
       tags:
@@ -374,13 +374,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OrderInfo'
-  /v1/daa/{ticker}/price:
+  /v1/daa/{ticker}:
     get:
       tags:
       - Strategies
-      summary: Current ticker
+      summary: Strategy details
       description: |-
-        Returns the current ticker of the Strategy. The price is refreshed every minute.
+        Endpoint: /v1/daa/{ticker}
+        Returns information about one specific DAA.
 
         ##### Request
 
@@ -390,124 +391,11 @@ paths:
 
         | Parameter  | Description   | Sample  |
         | ---|---|---|
-        | **currency** <br> *String*        |    Ticker of the currency that the price is quoted in.       |    USD    |
-        | **price** <br> *String*     |     The current price of the DAA in the quoted currency. Up to 6 decimal places of precision is possible.      |     1932.432456   |
-      operationId: daaPrice
-      parameters:
-      - name: ticker
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: currency
-        in: query
-        required: false
-        schema:
-          type: string
-          default: USD
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Ticker'
-  /v1/daa/{ticker}/pricehistory:
-    get:
-      tags:
-      - Strategies
-      summary: Historical information
-      description: "The price history returns data points for the given period. Different\
-        \ granulation of\ndata can be returned based on the length of the period provided\
-        \ from daily to 5 minute (one \nprice point per period).\n\nFrom and to are\
-        \ optional parameters (both are either suplied or neither is supplied). If\
-        \ from/to are not supplied a default of last month is returned\nwith hourly\
-        \ granulation.\n\n##### Request\n\nEmpty body.\n\n##### Response\n\n| Parameter\
-        \  | Description   | Sample  |\n| ---|---|---|\n| **currency** <br> *String*\
-        \        |    Ticker of the currency in which the prices are returned.   \
-        \    |  USD      |\n| **values** <br> *Array of objects*     |     Array of\
-        \ price point objects.      |   See price point objects     |\n| **from**\
-        \ <br> *Long*      |    Timestamp for when the chart information starts in\
-        \ <b>Epoch</b> seconds format.        |    1530615303    |\n| **to** <br>\
-        \ *Long*        |    Timestamp for when the chart information ends in <b>Epoch</b>\
-        \ seconds format.       |  1533207303      |\n| **granulation** <br> *String*\
-        \        |     Granulation for price points. See granulation enumeration section\
-        \ for more details.      |      HOURLY  |\n\nPrice point object:\n\n| Parameter\
-        \  | Description   | Sample  |\n| ---|---|---|\n| **timestamp** <br> *Long*\
-        \        |      Timestamp for the point in Epoch seconds format.     |   \
-        \ 1530705600    |\n| **price** <br> *String*     |     Price at the time point.\
-        \ Up to 6 decimal places of precision is possible.      |    1813.952343 \
-        \   |"
-      operationId: charts
-      parameters:
-      - name: ticker
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: currency
-        in: query
-        required: false
-        schema:
-          type: string
-          default: USD
-          enum:
-          - BTC
-          - USD
-          - EUR
-      - name: from
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: to
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: granulation
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - TWO_MINUTE
-          - FIVE_MINUTE
-          - FIFTEEN_MINUTE
-          - HOURLY
-          - THREE_HOURLY
-          - EIGHT_HOURLY
-          - DAILY
-          - MONTHLY
-          - YEARLY
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Chart'
-  /v1/daa/{ticker}/balance:
-    get:
-      tags:
-      - Strategies
-      summary: Balance
-      description: Returns live balance of strategy
-      operationId: daaBalance
+        | **name** <br> _String_ | Name of DAA | Blockchain index  |
+        | **manager** <br> _String_  | Manager of DAA  | Columbus Capital  |
+        | **ticker** <br> _String_  | DAA ticker  | BLX  |
+        | **type** <br> _String_  | Type of DAA. See DAA types</a> under enumerations section for possible options.  | PASSIVE  |
+      operationId: info
       parameters:
       - name: ticker
         in: path
@@ -526,7 +414,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyBalance'
+                $ref: '#/components/schemas/Strategy'
   /v1/daa/{ticker}/structure:
     get:
       tags:
@@ -625,6 +513,10 @@ paths:
         schema:
           type: string
           default: USD
+          enum:
+          - BTC
+          - USD
+          - EUR
       responses:
         "401":
           description: default response
@@ -641,6 +533,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistics'
+  /v1/daa/{ticker}/balance:
+    get:
+      tags:
+      - Strategies
+      summary: Balance
+      description: Returns live balance of strategy
+      operationId: daaBalance
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyBalance'
   /v1/daa:
     get:
       tags:
@@ -673,14 +591,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StrategyList'
-  /v1/daa/{ticker}:
+  /v1/daa/{ticker}/price:
     get:
       tags:
       - Strategies
-      summary: Strategy details
+      summary: Current ticker
       description: |-
-        Endpoint: /v1/daa/{ticker}
-        Returns information about one specific DAA.
+        Returns the current ticker of the Strategy. The price is refreshed every minute.
 
         ##### Request
 
@@ -690,17 +607,25 @@ paths:
 
         | Parameter  | Description   | Sample  |
         | ---|---|---|
-        | **name** <br> _String_ | Name of DAA | Blockchain index  |
-        | **manager** <br> _String_  | Manager of DAA  | Columbus Capital  |
-        | **ticker** <br> _String_  | DAA ticker  | BLX  |
-        | **type** <br> _String_  | Type of DAA. See DAA types</a> under enumerations section for possible options.  | PASSIVE  |
-      operationId: info
+        | **currency** <br> *String*        |    Ticker of the currency that the price is quoted in.       |    USD    |
+        | **price** <br> *String*     |     The current price of the DAA in the quoted currency. Up to 6 decimal places of precision is possible.      |     1932.432456   |
+      operationId: daaPrice
       parameters:
       - name: ticker
         in: path
         required: true
         schema:
           type: string
+      - name: currency
+        in: query
+        required: false
+        schema:
+          type: string
+          default: USD
+          enum:
+          - BTC
+          - USD
+          - EUR
       responses:
         "401":
           description: default response
@@ -713,7 +638,90 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Strategy'
+                $ref: '#/components/schemas/Ticker'
+  /v1/daa/{ticker}/pricehistory:
+    get:
+      tags:
+      - Strategies
+      summary: Historical information
+      description: "The price history returns data points for the given period. Different\
+        \ granulation of\ndata can be returned based on the length of the period provided\
+        \ from daily to 5 minute (one \nprice point per period).\n\nFrom and to are\
+        \ optional parameters (both are either suplied or neither is supplied). If\
+        \ from/to are not supplied a default of last month is returned\nwith hourly\
+        \ granulation.\n\n##### Request\n\nEmpty body.\n\n##### Response\n\n| Parameter\
+        \  | Description   | Sample  |\n| ---|---|---|\n| **currency** <br> *String*\
+        \        |    Ticker of the currency in which the prices are returned.   \
+        \    |  USD      |\n| **values** <br> *Array of objects*     |     Array of\
+        \ price point objects.      |   See price point objects     |\n| **from**\
+        \ <br> *Long*      |    Timestamp for when the chart information starts in\
+        \ <b>Epoch</b> seconds format.        |    1530615303    |\n| **to** <br>\
+        \ *Long*        |    Timestamp for when the chart information ends in <b>Epoch</b>\
+        \ seconds format.       |  1533207303      |\n| **granulation** <br> *String*\
+        \        |     Granulation for price points. See granulation enumeration section\
+        \ for more details.      |      HOURLY  |\n\nPrice point object:\n\n| Parameter\
+        \  | Description   | Sample  |\n| ---|---|---|\n| **timestamp** <br> *Long*\
+        \        |      Timestamp for the point in Epoch seconds format.     |   \
+        \ 1530705600    |\n| **price** <br> *String*     |     Price at the time point.\
+        \ Up to 6 decimal places of precision is possible.      |    1813.952343 \
+        \   |"
+      operationId: charts
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: currency
+        in: query
+        required: false
+        schema:
+          type: string
+          default: USD
+          enum:
+          - BTC
+          - USD
+          - EUR
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: granulation
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - TWO_MINUTE
+          - FIVE_MINUTE
+          - FIFTEEN_MINUTE
+          - HOURLY
+          - THREE_HOURLY
+          - EIGHT_HOURLY
+          - DAILY
+          - MONTHLY
+          - YEARLY
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chart'
   /v1/user/balance:
     get:
       tags:
@@ -742,6 +750,10 @@ paths:
         schema:
           type: string
           default: USD
+          enum:
+          - BTC
+          - USD
+          - EUR
       responses:
         "401":
           description: default response
@@ -784,6 +796,96 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+  /v1/asset/{ticker}:
+    get:
+      tags:
+      - Asset
+      summary: Asset details
+      description: |-
+        Endpoint: /v1/asset/{ticker}
+        Returns information about one specific Asset.
+      operationId: info_1
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Strategy'
+  /v1/asset/{ticker}/statistics:
+    get:
+      tags:
+      - Asset
+      summary: Statistics
+      description: Returns statistics of the strategy; returns, max drawdawn and volatility
+        for strategy.
+      operationId: getStatistics_1
+      parameters:
+      - name: ticker
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: currency
+        in: query
+        required: false
+        schema:
+          type: string
+          default: USD
+          enum:
+          - BTC
+          - USD
+          - EUR
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Statistics'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+  /v1/asset:
+    get:
+      tags:
+      - Asset
+      summary: List of Assets
+      description: Returns a list of all direct tradeable assets
+      operationId: daaList_1
+      responses:
+        "401":
+          description: default response
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
   /v1/asset/{ticker}/price:
     get:
       tags:
@@ -889,98 +991,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Chart'
-  /v1/asset/{ticker}/statistics:
-    get:
-      tags:
-      - Asset
-      summary: Statistics
-      description: Returns statistics of the strategy; returns, max drawdawn and volatility
-        for strategy.
-      operationId: getStatistics_1
-      parameters:
-      - name: ticker
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: currency
-        in: query
-        required: false
-        schema:
-          type: string
-          default: USD
-          enum:
-          - BTC
-          - USD
-          - EUR
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Statistics'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Statistics'
-  /v1/asset:
-    get:
-      tags:
-      - Asset
-      summary: List of Assets
-      description: Returns a list of all direct tradeable assets
-      operationId: daaList_1
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Asset'
-  /v1/asset/{ticker}:
-    get:
-      tags:
-      - Asset
-      summary: Asset details
-      description: |-
-        Endpoint: /v1/asset/{ticker}
-        Returns information about one specific Asset.
-      operationId: info_1
-      parameters:
-      - name: ticker
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "401":
-          description: default response
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Strategy'
 components:
   schemas:
+    OrderInfo:
+      required:
+      - source_ticker
+      - target_ticker
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - created
+          - active
+          - done
+          - failed
+          - unknown
+        orderId:
+          type: string
+        percentageCompleted:
+          type: number
+        source_ticker:
+          type: string
+        target_ticker:
+          type: string
+        amount:
+          minimum: 0
+          type: number
     OrderOffer:
       required:
       - amount
@@ -1084,99 +1121,31 @@ components:
           enum:
           - source
           - target
-    OrderInfo:
-      required:
-      - source_ticker
-      - target_ticker
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - created
-          - active
-          - done
-          - failed
-          - unknown
-        orderId:
-          type: string
-        percentageCompleted:
-          type: number
-        source_ticker:
-          type: string
-        target_ticker:
-          type: string
-        amount:
-          minimum: 0
-          type: number
-    Ticker:
+    Strategy:
       type: object
       properties:
         ticker:
           type: string
-        currency:
+        name:
           type: string
-        price:
+        manager:
+          type: string
+        managementType:
+          type: string
+        managementFee:
           type: number
-        change24h:
+        performanceFee:
           type: number
-        change7d:
+        entryFee:
           type: number
-        change1m:
-          type: number
-        change3m:
-          type: number
-        change6m:
-          type: number
-        change12m:
-          type: number
-        changeAll:
+        exitFee:
           type: number
         aum:
           type: number
-    Chart:
-      type: object
-      properties:
-        ticker:
-          type: string
+          deprecated: true
         currency:
           type: string
-        from:
-          type: integer
-          format: int64
-        to:
-          type: integer
-          format: int64
-        granulation:
-          type: string
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChartPoint'
-    ChartPoint:
-      type: object
-      properties:
-        x:
-          type: integer
-          format: int64
-        y:
-          type: string
-    StrategyBalance:
-      type: object
-      properties:
-        ticker:
-          type: string
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/StrategyBalanceElement'
-    StrategyBalanceElement:
-      type: object
-      properties:
-        ticker:
-          type: string
-        balance:
-          type: string
+          deprecated: true
     Structure:
       type: object
       properties:
@@ -1309,31 +1278,22 @@ components:
               type: number
             ALL_TIME:
               type: number
-    Strategy:
+    StrategyBalance:
       type: object
       properties:
         ticker:
           type: string
-        name:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/StrategyBalanceElement'
+    StrategyBalanceElement:
+      type: object
+      properties:
+        ticker:
           type: string
-        manager:
+        balance:
           type: string
-        managementType:
-          type: string
-        managementFee:
-          type: number
-        performanceFee:
-          type: number
-        entryFee:
-          type: number
-        exitFee:
-          type: number
-        aum:
-          type: number
-          deprecated: true
-        currency:
-          type: string
-          deprecated: true
     StrategyList:
       type: object
       properties:
@@ -1341,6 +1301,58 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Strategy'
+    Ticker:
+      type: object
+      properties:
+        ticker:
+          type: string
+        currency:
+          type: string
+        price:
+          type: number
+        change24h:
+          type: number
+        change7d:
+          type: number
+        change1m:
+          type: number
+        change3m:
+          type: number
+        change6m:
+          type: number
+        change12m:
+          type: number
+        changeAll:
+          type: number
+        aum:
+          type: number
+    Chart:
+      type: object
+      properties:
+        ticker:
+          type: string
+        currency:
+          type: string
+        from:
+          type: integer
+          format: int64
+        to:
+          type: integer
+          format: int64
+        granulation:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartPoint'
+    ChartPoint:
+      type: object
+      properties:
+        x:
+          type: integer
+          format: int64
+        y:
+          type: string
     Balance:
       type: object
       properties:
